@@ -1,0 +1,65 @@
+name: Rust Test
+on:
+  workflow_call:
+    inputs:
+      msrv:
+        description: "Minimum supported Rust version"
+        required: true
+        type: string
+      working-directory:
+        description: "Working directory relative to the repository root"
+        required: false
+        default: "."
+        type: string
+  workflow_dispatch:
+    inputs:
+      msrv:
+        description: "Minimum supported Rust version"
+        required: true
+        type: string
+      working-directory:
+        description: "Working directory relative to the repository root"
+        required: false
+        default: "."
+        type: string
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ inputs.working-directory }}
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: nightly
+          components: rustfmt, clippy
+          override: true
+      - uses: Swatinem/rust-cache@v1
+      - run: cargo clippy --all-features -- -D warnings
+      - run: cargo fmt -- --check
+
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        rust:
+          - stable
+          - ${{ inputs.msrv }}
+    defaults:
+      run:
+        working-directory: ${{ inputs.working-directory }}
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: ${{ matrix.rust }}
+          profile: minimal
+          override: true
+      - uses: Swatinem/rust-cache@v1
+      - run: cargo build --tests
+      - run: cargo test -- --nocapture --quiet

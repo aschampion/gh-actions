@@ -1,0 +1,6 @@
+name: All Workflow Lint CI
+on: [push, pull_request]
+
+jobs:
+  test:
+    uses: ./.github/workflows/actionlint.yml
