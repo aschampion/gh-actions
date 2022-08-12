@@ -1,6 +1,17 @@
 name: Rust Publish
 on:
   workflow_call:
+    inputs:
+      working-directory:
+        description: "Working directory relative to the repository root, such as for a workspace crate"
+        required: false
+        default: "."
+        type: string
+      tag-prefix:
+        description: "Tag prefix for version parsing"
+        required: false
+        default: ""
+        type: string
     secrets:
       CRATES_IO_TOKEN:
         description: "Crates.io token with privileges to publish crate"
@@ -9,6 +20,9 @@ on:
 jobs:
   publish:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ inputs.working-directory }}
     steps:
       - uses: actions/checkout@v3
       - uses: actions-rs/toolchain@v1
@@ -24,6 +38,7 @@ jobs:
         uses: taiki-e/create-gh-release-action@v1
         id: create_release
         with:
-          changelog: CHANGELOG.md
+          changelog: ${{ inputs.working-directory }}/CHANGELOG.md
+          prefix: ${{ inputs.tag-prefix }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
