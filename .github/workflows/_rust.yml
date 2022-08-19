@@ -2,8 +2,13 @@ name: Rust Workflow CI
 on: [push, pull_request]
 
 jobs:
-  test:
+  test-crate-01:
     uses: ./.github/workflows/rust-test.yml
     with:
       msrv: 1.56
       working-directory: rust/gha-test-crate-01
+  test-workspace-01:
+    uses: ./.github/workflows/rust-test.yml
+    with:
+      msrv: 1.56
+      working-directory: rust/gha-test-workspace-01
