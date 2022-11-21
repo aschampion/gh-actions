@@ -37,7 +37,7 @@ jobs:
           toolchain: nightly
           components: rustfmt, clippy
           override: true
-      - uses: Swatinem/rust-cache@v1
+      - uses: Swatinem/rust-cache@v2
       - run: cargo clippy --all-features -- -D warnings
       - run: cargo fmt -- --check
 
@@ -60,6 +60,6 @@ jobs:
           toolchain: ${{ matrix.rust }}
           profile: minimal
           override: true
-      - uses: Swatinem/rust-cache@v1
+      - uses: Swatinem/rust-cache@v2
       - run: cargo build --tests
       - run: cargo test -- --nocapture --quiet
